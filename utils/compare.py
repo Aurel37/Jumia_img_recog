@@ -4,9 +4,11 @@ import cv2
 from urllib.request import urlopen, Request
 from .reframe import zoomclass
 import matplotlib.pyplot as plt
+
 from .predict import predict_label, LABEL
 from .model import net_model
 import os
+
 
 def vector_feature(img, basemodel):
     """Convert the array img in a vector that can be analysed"""
@@ -18,27 +20,33 @@ def vector_feature(img, basemodel):
 class get_pict:
     """Find the closest picture of img in the library of url lib"""
 
+
     def __init__(self, img, lib):
+
         """img : cv2 image
            lib : numpy array of url
            config : path to yolo config.cfg
            weights : path to yolo .weights
            label : path to yolo .names"""
         pict = cv2.imread(img)
+
         self.imgs = zoomclass('t_shirt', pict)
         self.n = len(self.imgs)
         self.lib = lib
+
 
         self.img_close = {}
         self.img_dist = {}
         for i in range(self.n):
             self.img_close[i] = []
             self.img_dist[i] = []
+
         net_model.load_weights(os.getcwd() + '/utils/weights/weights')
         self.net_model = net_model
 
         self.label_name = LABEL
         self.label = [predict_label(img, net_model, LABEL) for img in self.imgs]
+
 
     def open_url(self, url):
         """
@@ -53,6 +61,7 @@ class get_pict:
         #print(type(req))
         img = np.asarray(bytearray(req), dtype="uint8")
         return cv2.imdecode(img, cv2.IMREAD_COLOR)
+
  
     def vect_compare(self, pict_lib, vect_imgs, basemodel, distance, threshold, curs, i):
         blob = cv2.dnn.blobFromImage(pict_lib, 1/255.0, (416, 416), swapRB=True, crop=False)
@@ -68,6 +77,7 @@ class get_pict:
                     self.img_close[compt].append(i)
                     self.img_dist[compt].append(dist_feat)
             compt += 1
+
 
     def compare(self, Model, network, layer, distance, threshold=0.7, yolo=False, treat=None):
         """
@@ -98,12 +108,14 @@ class get_pict:
             #pict_libs = cv2.dnn.blobFromImage(pict_libs, 1/255.0, (416, 416), swapRB=True, crop=False)
             #if yolo:
             if not(error):
+
                 if yolo:
                     pict_libs = zoomclass('t_shirt', pict_libs)
                     for pict_lib in pict_libs:
                         self.vect_compare(pict_lib, vect_imgs, basemodel, distance, threshold, curs, i)
                 else:
                     self.vect_compare(pict_libs, vect_imgs, basemodel, distance, threshold, curs, i)
+
     def display(self):
         """Display the closest picture from self.imgs"""
         for i in range(self.n):

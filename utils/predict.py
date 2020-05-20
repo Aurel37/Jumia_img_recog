@@ -1,12 +1,12 @@
 import numpy
 import cv2
 
-LABEL = ['polo', 'shirt', 't_shirt']
+LABEL = ['polo', 't_shirt']
 
 
 def predict_label(img, net_model, label):
-    img1 = cv2.resize(img, (224, 224))
-    predict = net_model.predict(img1.reshape(1, 224, 224, 3))
+    img1 = cv2.resize(img, (80, 80))
+    predict = net_model.predict(img1.reshape(1, 80, 80, 3))
     maxi = predict[0][0]
     curs = 0
     test = 0

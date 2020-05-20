@@ -73,7 +73,7 @@ class get_pict:
             if lb == self.label[j]:
                 dist_feat = distance(vect_img, vect_pict_lib)
                 print("dist", dist_feat, " nb ", curs, end="\r")
-                if dist_feat > threshold:
+                if dist_feat > threshold and i not in self.img_close:
                     self.img_close[compt].append(i)
                     self.img_dist[compt].append(dist_feat)
             compt += 1

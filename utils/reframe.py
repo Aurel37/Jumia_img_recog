@@ -5,8 +5,12 @@ import os
 from .treat import centering
 
 
-def zoomclass(classname, img, config="yolo-coco/yolov3-spp.cfg", weights="yolo-coco/t_shirt.weights", label="yolo-coco/t_shirt.names", threshold=0.3, cfd=0.3):
-
+def zoomclass(classname='t_shirts', img, config="yolo-coco/yolov3-spp.cfg", weights="yolo-coco/t_shirt.weights", label="yolo-coco/t_shirt.names", threshold=0.3, cfd=0.3):
+    """
+    Return a list of tabs, each tab represents a zoom on a t-shirt presents in img
+    classname : a string
+    img : the picture to treat
+    """
     LABEL = open(label).read().strip().split("\n")
 
     network = cv2.dnn.readNetFromDarknet(config, weights)

@@ -1,3 +1,4 @@
+"""Network to classify a picture between the class polo or t-shirt"""
 from tensorflow.keras import layers, models
 from tensorflow.keras import regularizers
 

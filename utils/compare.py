@@ -22,7 +22,6 @@ class get_pict:
 
 
     def __init__(self, img, lib):
-
         """img : cv2 image
            lib : numpy array of url
            config : path to yolo config.cfg
@@ -30,10 +29,11 @@ class get_pict:
            label : path to yolo .names"""
         pict = cv2.imread(img)
 
+        #the picture converted in a cv2 tab, its a list of tab, 
+        #each tab is a zoom on a t-shirt, if there is no zoom there is no comparison
         self.imgs = zoomclass('t_shirt', pict)
         self.n = len(self.imgs)
         self.lib = lib
-
 
         self.img_close = {}
         self.img_dist = {}
@@ -41,10 +41,13 @@ class get_pict:
             self.img_close[i] = []
             self.img_dist[i] = []
 
+        #net_model is the network that classifies between a t-shirt and a polo
         net_model.load_weights(os.getcwd() + '/utils/weights/weights')
         self.net_model = net_model
 
+        #LABEL is a list of labels ['polo', 't-shirt']
         self.label_name = LABEL
+        #we need the labels of the image to analyse
         self.label = [predict_label(img, net_model, LABEL) for img in self.imgs]
 
 
@@ -57,13 +60,15 @@ class get_pict:
         headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.3'}
         req = Request(url=url, headers=headers)
         req = urlopen(req).read()
-        #print(req)
-        #print(type(req))
         img = np.asarray(bytearray(req), dtype="uint8")
         return cv2.imdecode(img, cv2.IMREAD_COLOR)
 
  
     def vect_compare(self, pict_lib, vect_imgs, basemodel, distance, threshold, curs, i):
+        """
+        Compare pict_lib to vect_imgs according to basemodel and distance
+        """
+        #normalize the picture
         blob = cv2.dnn.blobFromImage(pict_lib, 1/255.0, (416, 416), swapRB=True, crop=False)
         resize = blob[0].reshape((416, 416, 3))
         vect_pict_lib = vector_feature(resize, basemodel)
@@ -81,7 +86,7 @@ class get_pict:
 
     def compare(self, Model, network, layer, distance, threshold=0.7, yolo=False, treat=None):
         """
-        Find the closest pictures of self.imgs in the library self.lib 
+        Find the closest pictures of self.imgs in the library self.lib
         according to the network 'netword' and the distance 'distance'
 
         Model : the base model for prediction
@@ -89,10 +94,12 @@ class get_pict:
         layer : the layer of the network that is interesting
         distance : the distance to compare 2 picture
         threshold : (opt) float
+        yolo : (opt) a boolean, if true each image of the dataset are recentred with yolo, it may be longer
         """
         basemodel = Model(inputs=network.input, outputs=layer)
         vect_imgs = []
         for i in self.imgs:
+            #each tab of self.imgs is converted into a vector
             blob = cv2.dnn.blobFromImage(i, 1/255.0, (416, 416), swapRB=True, crop=False)
             resize = blob[0].reshape((416, 416, 3))
             print(resize.shape)
@@ -105,10 +112,8 @@ class get_pict:
                 pict_libs = self.open_url(i)
             except:
                 error = True
-            #pict_libs = cv2.dnn.blobFromImage(pict_libs, 1/255.0, (416, 416), swapRB=True, crop=False)
-            #if yolo:
-            if not(error):
 
+            if not(error):
                 if yolo:
                     pict_libs = zoomclass('t_shirt', pict_libs)
                     for pict_lib in pict_libs:

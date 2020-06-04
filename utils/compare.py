@@ -98,28 +98,31 @@ class get_pict:
         """
         basemodel = Model(inputs=network.input, outputs=layer)
         vect_imgs = []
-        for i in self.imgs:
-            #each tab of self.imgs is converted into a vector
-            blob = cv2.dnn.blobFromImage(i, 1/255.0, (416, 416), swapRB=True, crop=False)
-            resize = blob[0].reshape((416, 416, 3))
-            print(resize.shape)
-            vect_imgs.append(vector_feature(resize, basemodel))
-        curs = 0
-        for i in self.lib:
-            curs += 1
-            error = False
-            try:
-                pict_libs = self.open_url(i)
-            except:
-                error = True
+        if self.n !=  0:
+            for i in self.imgs:
+                #each tab of self.imgs is converted into a vector
+                blob = cv2.dnn.blobFromImage(i, 1/255.0, (416, 416), swapRB=True, crop=False)
+                resize = blob[0].reshape((416, 416, 3))
+                print(resize.shape)
+                vect_imgs.append(vector_feature(resize, basemodel))
+            curs = 0
+            for i in self.lib:
+                curs += 1
+                error = False
+                try:
+                    pict_libs = self.open_url(i)
+                except:
+                    error = True
 
-            if not(error):
-                if yolo:
-                    pict_libs = zoomclass('t_shirt', pict_libs)
-                    for pict_lib in pict_libs:
-                        self.vect_compare(pict_lib, vect_imgs, basemodel, distance, threshold, curs, i)
-                else:
-                    self.vect_compare(pict_libs, vect_imgs, basemodel, distance, threshold, curs, i)
+                if not(error):
+                    if yolo:
+                        pict_libs = zoomclass('t_shirt', pict_libs)
+                        for pict_lib in pict_libs:
+                            self.vect_compare(pict_lib, vect_imgs, basemodel, distance, threshold, curs, i)
+                    else:
+                        self.vect_compare(pict_libs, vect_imgs, basemodel, distance, threshold, curs, i)
+        else:
+            print('There is no t-shirt in the input picture')
 
     def display(self):
         """Display the closest picture from self.imgs"""
